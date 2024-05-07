@@ -1,3 +1,4 @@
+use rand::Rng;
 use serde::{Deserialize, Serialize};
 use web_sys::HtmlInputElement;
 use yew::prelude::*;
@@ -85,6 +86,8 @@ impl Component for Chat {
         match msg {
             Msg::HandleMsg(s) => {
                 let msg: WebSocketMessage = serde_json::from_str(&s).unwrap();
+                let mut rng = rand::thread_rng();
+                let n: u32 = rng.gen_range(0..3);
                 match msg.message_type {
                     MsgTypes::Users => {
                         let users_from_message = msg.data_array.unwrap_or_default();
@@ -93,8 +96,14 @@ impl Component for Chat {
                             .map(|u| UserProfile {
                                 name: u.into(),
                                 avatar: format!(
-                                    "https://avatars.dicebear.com/api/adventurer-neutral/{}.svg",
-                                    u
+                                    "{}",
+                                    match n {
+                                        0 => "https://api.dicebear.com/8.x/adventurer/svg?seed=Casper".to_string(),
+                                        1 => "https://api.dicebear.com/8.x/adventurer/svg?seed=Bob".to_string(),
+                                        2 => "https://api.dicebear.com/8.x/adventurer/svg?seed=Loki".to_string(),
+                                        3 => "https://api.dicebear.com/8.x/adventurer/svg?seed=Muffin".to_string(),
+                                        _ => "".to_string(),
+                                    },
                                 )
                                 .into(),
                             })
